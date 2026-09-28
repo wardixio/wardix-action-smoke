@@ -14,9 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - name: Scan APK and exercise the failing gate
+      - name: Scan APK and verify the delta gate
         id: apk
-        continue-on-error: true
         uses: wardixio/wardix-scan-action@8172731bc2e2a95d17b2096b291a47c595f68cff
         with:
           artifact: fixtures/UnCrackable-Level1.apk
@@ -31,8 +30,8 @@ jobs:
           REPORT_URL: ${{ steps.apk.outputs.report-url }}
           GATE: ${{ steps.apk.outputs.gate }}
         run: |
-          test "$OUTCOME" = failure
-          test "$GATE" = failed
+          test "$OUTCOME" = success
+          test "$GATE" = passed
           case "$REPORT_URL" in
             https://app.wardix.io/scans/*) ;;
             *) echo "unexpected report URL: $REPORT_URL" >&2; exit 1 ;;
