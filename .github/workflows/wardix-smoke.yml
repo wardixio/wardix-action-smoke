@@ -19,7 +19,7 @@ jobs:
         continue-on-error: true
         uses: wardixio/wardix-scan-action@199f6d36c7a93d0f4d2d4641045a02cb5686cfd0
         with:
-          artifact: fixtures/InsecureBankv2-2.3.1.apk
+          artifact: fixtures/UnCrackable-Level1.apk
           key: ${{ secrets.WARDIX_ALPHA_KEY }}
           fail-on: info
           timeout: "1500"
