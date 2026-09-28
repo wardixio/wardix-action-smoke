@@ -1,0 +1,64 @@
+name: Wardix Action production smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Scan APK and verify the delta gate
+        id: apk
+        uses: wardixio/wardix-scan-action@8172731bc2e2a95d17b2096b291a47c595f68cff
+        with:
+          artifact: fixtures/UnCrackable-Level1.apk
+          key: ${{ secrets.WARDIX_ALPHA_KEY }}
+          fail-on: info
+          timeout: "1500"
+          comment: "true"
+          upload-sarif: "true"
+      - name: Verify APK outputs and gate
+        env:
+          OUTCOME: ${{ steps.apk.outcome }}
+          REPORT_URL: ${{ steps.apk.outputs.report-url }}
+          GATE: ${{ steps.apk.outputs.gate }}
+        run: |
+          test "$OUTCOME" = success
+          test "$GATE" = passed
+          case "$REPORT_URL" in
+            https://app.wardix.io/scans/*) ;;
+            *) echo "unexpected report URL: $REPORT_URL" >&2; exit 1 ;;
+          esac
+
+  ipa:
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Scan IPA with the gate disabled
+        id: ipa
+        uses: wardixio/wardix-scan-action@8172731bc2e2a95d17b2096b291a47c595f68cff
+        with:
+          artifact: fixtures/iGoat-Swift-8c8a8ed.ipa
+          key: ${{ secrets.WARDIX_ALPHA_KEY }}
+          fail-on: none
+          timeout: "1500"
+          comment: "true"
+          upload-sarif: "true"
+      - name: Verify IPA outputs and gate
+        env:
+          REPORT_URL: ${{ steps.ipa.outputs.report-url }}
+          GATE: ${{ steps.ipa.outputs.gate }}
+        run: |
+          test "$GATE" = off
+          case "$REPORT_URL" in
+            https://app.wardix.io/scans/*) ;;
+            *) echo "unexpected report URL: $REPORT_URL" >&2; exit 1 ;;
+          esac
