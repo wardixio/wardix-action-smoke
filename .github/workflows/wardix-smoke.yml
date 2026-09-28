@@ -17,7 +17,7 @@ jobs:
       - name: Scan APK and exercise the failing gate
         id: apk
         continue-on-error: true
-        uses: wardixio/wardix-scan-action@199f6d36c7a93d0f4d2d4641045a02cb5686cfd0
+        uses: wardixio/wardix-scan-action@8172731205c0b5be3bfaec73b98773f2f217823e
         with:
           artifact: fixtures/UnCrackable-Level1.apk
           key: ${{ secrets.WARDIX_ALPHA_KEY }}
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Scan IPA with the gate disabled
         id: ipa
-        uses: wardixio/wardix-scan-action@199f6d36c7a93d0f4d2d4641045a02cb5686cfd0
+        uses: wardixio/wardix-scan-action@8172731205c0b5be3bfaec73b98773f2f217823e
         with:
           artifact: fixtures/iGoat-Swift-8c8a8ed.ipa
           key: ${{ secrets.WARDIX_ALPHA_KEY }}
